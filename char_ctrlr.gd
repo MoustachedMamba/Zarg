@@ -11,6 +11,7 @@ extends CharacterBody3D
 @export var accel = 5.0
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
+@onready var collider = $CollisionShape3D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var look_rot : Vector2
@@ -21,10 +22,15 @@ var head_bob_timer = 0.0
 var head_height_default = 1.5
 var head_height_crouch = 0.7
 var crouched = false
+var crouch_input = false
 var sprinting = false
+var crouch_height = 1.0
+var stand_height
 
 func _ready():
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)	
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	stand_height = collider.shape.height
+	
 	
 func _physics_process(delta):
 	# Add the gravity.
@@ -37,6 +43,11 @@ func _physics_process(delta):
 		
 	
 	head.position.y = lerp(head.position.y,float(crouched)*head_height_crouch+float(!crouched)*head_height_default,delta*5)
+	if !crouch_input and crouched:
+		crouched = is_under_smth()
+		if !crouched:
+			target_speed = sprint_speed if sprinting else walk_speed
+	get_crouch(delta*5,crouched)
 	current_speed = lerp(current_speed,target_speed,accel*delta)
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -62,6 +73,7 @@ func _process(delta):
 	if is_on_floor():
 		head_bob_timer += delta*velocity.length()*3.0
 	headbob.position.y = sin(head_bob_timer)*0.1
+	print(target_speed)
 		
 	
 	
@@ -91,12 +103,23 @@ func _input(event):
 			target_speed = walk_speed
 	if event.is_action_pressed("Crouch"):
 		crouched = true
+		crouch_input = true
 		target_speed = crouch_walk_speed
 	if event.is_action_released("Crouch"):
-		crouched = false
-		if sprinting:
+		crouch_input = false
+		crouched = is_under_smth()
+		if sprinting and !crouched:
 			target_speed = sprint_speed
-		else:
+		elif !crouched:
 			target_speed = walk_speed
 	
+func get_crouch(delta : float, crouching = false):
+	var target_height : float = crouch_height if crouching else stand_height
+	
+	collider.shape.height = lerp(collider.shape.height, target_height, delta)
+	collider.position.y = lerp(collider.position.y, target_height * 0.5, delta)
+	head.position.y = collider.shape.height-0.5
+
+func is_under_smth()->bool:
+	return $CollisionShape3D/Area3D.has_overlapping_bodies()
 	

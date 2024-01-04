@@ -121,5 +121,5 @@ func get_crouch(delta : float, crouching = false):
 	head.position.y = collider.shape.height-0.5
 
 func is_under_smth()->bool:
-	return $CollisionShape3D/Area3D.has_overlapping_bodies()
+	return $CollisionShape3D/Area3D.has_overlapping_bodies() and is_on_floor()
 	

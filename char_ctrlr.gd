@@ -1,15 +1,14 @@
 extends CharacterBody3D
 
 
-@export var walk_speed = 4.0
+@export var walk_speed = 3.5
 @export var sprint_speed = 7.0
 @export var crouch_walk_speed = 2.0
-@export var crouch_sprint_speed = 3.5
-@export var jump_velocity = 4.5
-@export var sensitivity = Vector2(0.6,0.8)
+@export var jump_velocity = 5.0
+@export var sensitivity = Vector2(0.2,0.4)
 @export var camera_responsive = Vector2(7.0,7.0)
 @export var air_control = 0.0
-@export var accel = 16.0
+@export var accel = 5.0
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
 # Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -38,17 +37,19 @@ func _physics_process(delta):
 		
 	
 	head.position.y = lerp(head.position.y,float(crouched)*head_height_crouch+float(!crouched)*head_height_default,delta*5)
-	current_speed = lerp(current_speed,target_speed,accel*delta*0.3)
+	current_speed = lerp(current_speed,target_speed,accel*delta)
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	if direction:
+	if direction and is_on_floor():
 		velocity.x = lerp(velocity.x,direction.x * current_speed,accel*delta)
 		velocity.z = lerp(velocity.z,direction.z * current_speed,accel*delta)
-	else:
+	elif is_on_floor():
 		velocity.x = lerp(velocity.x, 0.0, accel*delta)
 		velocity.z = lerp(velocity.z, 0.0, accel*delta)
+	else:
+		pass
 
 	move_and_slide()
 	look_rot.x = lerp(look_rot.x,look_target.x,delta*camera_responsive.x)
@@ -66,8 +67,8 @@ func _process(delta):
 	
 func _input(event):
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		look_target.y -= event.relative.x*sensitivity.x
-		look_target.x -= event.relative.y*sensitivity.y
+		look_target.y -= event.relative.x * sensitivity.x * (0.5 + float(is_on_floor())*0.5)
+		look_target.x -= event.relative.y * sensitivity.y * (0.5 + float(is_on_floor())*0.5)
 		look_target.x = clamp(look_target.x,-80,90)	
 	
 	if event.is_action_pressed("Exit"):

@@ -126,7 +126,9 @@ func is_under_smth()->bool:
 	return $CollisionShape3D/Area3D.has_overlapping_bodies() and is_on_floor()
 
 func get_lean(delta):
-	var target_lean : float = float(Input.is_action_pressed("LeanRight")) - float(Input.is_action_pressed("LeanLeft"))
-	target_lean *= float($CollisionShape3D/Area3D2.has_overlapping_bodies())
+	var can_lean_right = float(!$CollisionShape3D/right_ear.has_overlapping_bodies() and $CollisionShape3D/front.has_overlapping_bodies())
+	var can_lean_left = float(!$CollisionShape3D/left_ear.has_overlapping_bodies() and $CollisionShape3D/front.has_overlapping_bodies())
+	var target_lean : float = float(Input.is_action_pressed("LeanRight"))*can_lean_right - float(Input.is_action_pressed("LeanLeft"))*can_lean_left
+	print(target_lean)
 	head.position.x = lerp(head.position.x, 0.7*target_lean, delta*(4.0 - abs(target_lean)))
 	head.rotation_degrees.z = lerp(head.rotation_degrees.z, -20*target_lean, delta*(4.0 - abs(target_lean)))

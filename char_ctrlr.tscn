@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://blvmdr608af46"]
+[gd_scene load_steps=6 format=3 uid="uid://blvmdr608af46"]
 
 [ext_resource type="Script" path="res://char_ctrlr.gd" id="1_sdke7"]
 
@@ -9,7 +9,9 @@ height = 1.0
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_p3kef"]
 height = 1.0
-radius = 1.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_muw0k"]
+size = Vector3(2, 1, 1)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
@@ -26,11 +28,29 @@ collision_layer = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.996175, 0)
 shape = SubResource("CylinderShape3D_ylpwl")
 
-[node name="Area3D2" type="Area3D" parent="CollisionShape3D"]
+[node name="right_ear" type="Area3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
 collision_layer = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/Area3D2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/right_ear"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 0)
 shape = SubResource("CylinderShape3D_p3kef")
+
+[node name="left_ear" type="Area3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/left_ear"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.5, 0)
+shape = SubResource("CylinderShape3D_p3kef")
+
+[node name="front" type="Area3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/front"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -1)
+shape = SubResource("BoxShape3D_muw0k")
 
 [node name="head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.56581, 0)

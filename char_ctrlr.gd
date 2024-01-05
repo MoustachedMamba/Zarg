@@ -8,7 +8,8 @@ extends CharacterBody3D
 @export var sensitivity = Vector2(0.25,0.4)
 @export var camera_responsive = Vector2(7.0,7.0)
 @export var air_control = 0.0
-@export var accel = 5.5
+@export var gain_accel = 4.0
+@export var lose_accel = 5.5
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
 @onready var collider = $CollisionShape3D
@@ -43,17 +44,17 @@ func _physics_process(delta):
 		if !crouched:
 			target_speed = sprint_speed if sprinting else walk_speed
 	get_crouch(delta*5,crouched)
-	current_speed = lerp(current_speed,target_speed,accel*delta)
+	current_speed = lerp(current_speed,target_speed,gain_accel*delta)
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction and is_on_floor():
-		velocity.x = lerp(velocity.x,direction.x * current_speed,accel*delta)
-		velocity.z = lerp(velocity.z,direction.z * current_speed,accel*delta)
+		velocity.x = lerp(velocity.x,direction.x * current_speed,gain_accel*delta)
+		velocity.z = lerp(velocity.z,direction.z * current_speed,gain_accel*delta)
 	elif is_on_floor():
-		velocity.x = lerp(velocity.x, 0.0, accel*delta)
-		velocity.z = lerp(velocity.z, 0.0, accel*delta)
+		velocity.x = lerp(velocity.x, 0.0, lose_accel*delta)
+		velocity.z = lerp(velocity.z, 0.0, lose_accel*delta)
 	else:
 		pass
 
@@ -73,10 +74,9 @@ func _process(delta):
 	headbob.position.y = sin(head_bob_timer)*0.1
 	vert_offset = lerp(vert_offset,clamp(velocity.y,-10.0,6)*0.07,delta*4.0)
 	headbob.position.y += vert_offset*1.6
-	headbob.rotation_degrees.x = vert_offset*9
 	
-		
-	
+	headbob.rotation_degrees.x = vert_offset*9 
+			
 	
 func _input(event):
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:

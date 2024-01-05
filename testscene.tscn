@@ -38,7 +38,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_lq77h")
 transform = Transform3D(1, 0, 0, 0, 0.592702, 0.805422, 0, -0.805422, 0.592702, 0, 7.95953, 0)
 
 [node name="CharacterBody3D" parent="." instance=ExtResource("1_8w41q")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.07434, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.74839, 6.63781, 0.625831)
 
 [node name="StaticBody3D2" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.67664, 3.09101, 0)
@@ -90,6 +90,17 @@ transform = Transform3D(-0.359948, 0, -0.932972, 0, 1, 0, 0.932972, 0, -0.359948
 shape = SubResource("BoxShape3D_qqvgn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D6"]
+mesh = SubResource("BoxMesh_rf37o")
+skeleton = NodePath("../../StaticBody3D3")
+surface_material_override/0 = SubResource("StandardMaterial3D_lq77h")
+
+[node name="StaticBody3D7" type="StaticBody3D" parent="."]
+transform = Transform3D(-0.217252, -0.313362, -4.49218, -0.636549, 0.0736825, 1.58964, -0.0223436, 0.94774, -1.60889, 12.9619, 2.37954, 2.81816)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D7"]
+shape = SubResource("BoxShape3D_qqvgn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D7"]
 mesh = SubResource("BoxMesh_rf37o")
 skeleton = NodePath("../../StaticBody3D3")
 surface_material_override/0 = SubResource("StandardMaterial3D_lq77h")

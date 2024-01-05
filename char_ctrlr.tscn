@@ -9,9 +9,10 @@ height = 1.0
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_p3kef"]
 height = 1.0
+radius = 0.4
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_muw0k"]
-size = Vector3(2, 1, 1)
+size = Vector3(0.4, 1.5, 0.4)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
@@ -25,35 +26,32 @@ shape = SubResource("CapsuleShape3D_glkw2")
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.996175, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_ylpwl")
 
 [node name="right_ear" type="Area3D" parent="CollisionShape3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/right_ear"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0, -0.25)
 shape = SubResource("CylinderShape3D_p3kef")
 
 [node name="left_ear" type="Area3D" parent="CollisionShape3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/left_ear"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0, -0.25)
 shape = SubResource("CylinderShape3D_p3kef")
 
 [node name="front" type="Area3D" parent="CollisionShape3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56581, 0)
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CollisionShape3D/front"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)
 shape = SubResource("BoxShape3D_muw0k")
 
 [node name="head" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.56581, 0)
+transform = Transform3D(1, -0.000741469, 0.000115489, 0.000741468, 1, 1.1147e-05, -0.000115497, -1.10564e-05, 1, 0, 1.8, 0)
 
 [node name="headbobcentre" type="Node3D" parent="head"]
 

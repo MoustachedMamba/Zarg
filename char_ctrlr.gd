@@ -26,7 +26,7 @@ var crouch_input = false
 var sprinting = false
 var crouch_height = 1.0
 var stand_height
-
+var lean = 0
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	stand_height = collider.shape.height
@@ -43,6 +43,8 @@ func _physics_process(delta):
 		
 	
 	head.position.y = lerp(head.position.y,float(crouched)*head_height_crouch+float(!crouched)*head_height_default,delta*5)
+	if crouch_input and !crouched:
+		crouched = is_on_floor()
 	if !crouch_input and crouched:
 		crouched = is_under_smth()
 		if !crouched:
@@ -67,13 +69,13 @@ func _physics_process(delta):
 	look_rot.y = lerp(look_rot.y,look_target.y,delta*camera_responsive.y)
 	head.rotation_degrees.x = look_rot.x
 	rotation_degrees.y = look_rot.y
+	get_lean(delta)
 	
 		
 func _process(delta):
 	if is_on_floor():
 		head_bob_timer += delta*velocity.length()*3.0
 	headbob.position.y = sin(head_bob_timer)*0.1
-	print(target_speed)
 		
 	
 	
@@ -89,7 +91,7 @@ func _input(event):
 	if event.is_action_pressed("Return") and Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-	if event.is_action_pressed("Jump") and is_on_floor():
+	if event.is_action_pressed("Jump") and is_on_floor() and !is_under_smth():
 		velocity.y = jump_velocity
 	if event.is_action_pressed("Sprint"):
 		sprinting = true
@@ -102,7 +104,7 @@ func _input(event):
 		else:
 			target_speed = walk_speed
 	if event.is_action_pressed("Crouch"):
-		crouched = true
+		if is_on_floor(): crouched = true
 		crouch_input = true
 		target_speed = crouch_walk_speed
 	if event.is_action_released("Crouch"):
@@ -122,4 +124,9 @@ func get_crouch(delta : float, crouching = false):
 
 func is_under_smth()->bool:
 	return $CollisionShape3D/Area3D.has_overlapping_bodies() and is_on_floor()
-	
+
+func get_lean(delta):
+	var target_lean : float = float(Input.is_action_pressed("LeanRight")) - float(Input.is_action_pressed("LeanLeft"))
+	target_lean *= float($CollisionShape3D/Area3D2.has_overlapping_bodies())
+	head.position.x = lerp(head.position.x, 0.7*target_lean, delta*(4.0 - abs(target_lean)))
+	head.rotation_degrees.z = lerp(head.rotation_degrees.z, -20*target_lean, delta*(4.0 - abs(target_lean)))

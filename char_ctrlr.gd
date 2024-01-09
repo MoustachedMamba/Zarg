@@ -1,15 +1,17 @@
 extends CharacterBody3D
 
 
-@export var walk_speed = 3.5
+@export var walk_speed = 4.0
 @export var sprint_speed = 7.0
-@export var crouch_walk_speed = 2.0
+@export var crouch_walk_speed = 2.5
 @export var jump_velocity = 5.0
 @export var sensitivity = Vector2(0.25,0.4)
 @export var camera_responsive = Vector2(7.0,7.0)
 @export var air_control = 0.0
 @export var gain_accel = 4.0
-@export var lose_accel = 5.5
+@export var lose_accel = 6.5
+@export var bob_amp = 0.02
+@export var bob_fr = 3.0
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
 @onready var collider = $CollisionShape3D
@@ -27,7 +29,10 @@ var crouch_height = 1.0
 var stand_height
 var lean = 0
 var vert_offset = 0.0
+var start_pos
+
 func _ready():
+	start_pos = position
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	stand_height = collider.shape.height
 	
@@ -70,8 +75,8 @@ func _physics_process(delta):
 		
 func _process(delta):
 	if is_on_floor():
-		head_bob_timer += delta*velocity.length()*3.0
-	headbob.position.y = sin(head_bob_timer)*0.1
+		head_bob_timer += delta*velocity.length()*bob_fr
+	headbob.position.y = sin(head_bob_timer)*clamp(current_speed,3.0,5.0)*bob_amp
 	vert_offset = lerp(vert_offset,clamp(velocity.y,-10.0,6)*0.07,delta*4.0)
 	headbob.position.y += vert_offset*1.6
 	
@@ -131,3 +136,6 @@ func determine_speed():
 func camera_fov_control():
 	$head/headbobcentre/Camera3D.set_fov(70+0.2*Vector2(velocity.z,velocity.x).length()*current_speed + 0.4*abs(head.rotation_degrees.z))
 		
+
+func die():
+	position = start_pos

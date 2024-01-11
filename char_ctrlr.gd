@@ -116,25 +116,25 @@ func _input(event):
 	if event.is_action_released("Crouch"):
 		crouch_input = false
 		crouched = is_under_smth()
-	if event.is_action_pressed("AttackLeft"):
+	if event.is_action_pressed("AttackLeft") and state == "normal":
 		attack_hold_dir = 1
 		$WindupTimer.start()
 		state = "windup"
-	if event.is_action_pressed("AttackRight"):
+	if event.is_action_pressed("AttackRight") and state == "normal":
 		attack_hold_dir = -1
 		$WindupTimer.start()
 		state = "windup"
-	if event.is_action_released("AttackLeft"):
+	if event.is_action_released("AttackLeft") :
 		attack_hold_dir = 0
 		attack_power = -1*(0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
-		$AttackTimer.wait_time = attack_power
+		$AttackTimer.wait_time = abs(attack_power)
 		$AttackTimer.start()
 		$WindupTimer.stop()
 		state = "attacking"
 	if event.is_action_released("AttackRight"):
 		attack_hold_dir = 0
 		attack_power = (0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
-		$AttackTimer.wait_time = attack_power
+		$AttackTimer.wait_time = 0.3 + (attack_power-0.2)*0.3
 		$AttackTimer.start()
 		$WindupTimer.stop()
 		state = "attacking"
@@ -175,44 +175,45 @@ func handlehands(delta):
 	var target_rot = Quaternion(handtarget.basis.orthonormalized())
 	var current_rot = Quaternion(handtarget.basis.orthonormalized())
 	var centerbasis = $head/headbobcentre/hand_temp.basis.rotated(Vector3(0, 1, 0),PI).orthonormalized()
-	var rotspeed = 0.1
 	var progress = 0
 	if($head/headbobcentre/hand_temp/RayCast3D.is_colliding()):
-		handpos = $head/headbobcentre/hand_temp.to_local($head/headbobcentre/hand_temp/RayCast3D.get_collision_point())/2
+		handpos = $head/headbobcentre/hand_temp.to_local($head/headbobcentre/hand_temp/RayCast3D.get_collision_point())*3/5
 	else:
 		handpos = default_handpos
 	if state == "normal":
 		target_rot = Quaternion(centerbasis)
-		handtarget.position = lerp(handtarget.position, handpos,delta*4)
-		rotspeed = 0.03
+		handtarget.position = lerp(handtarget.position, handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3),delta*4)
+		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized())
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
 	elif state == "windup":
-		handpos.x += (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * attack_hold_dir * 3
-		handpos.z -= (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * 0.5
-		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),-1*attack_hold_dir).orthonormalized())
-		handtarget.position = lerp(handtarget.position, handpos,delta*3)
-		rotspeed = 0.01
-		progress = 1-$WindupTimer.time_left/$WindupTimer.wait_time
+		handpos.x += (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * attack_hold_dir * 2
+		handpos.z -= (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * 1
+		handpos.y += (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * 1
+		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),-0.4*attack_hold_dir).orthonormalized())
+		handtarget.position = lerp(handtarget.position, handpos,delta*10)
+		progress = pow(1-$WindupTimer.time_left/$WindupTimer.wait_time, 2.0)
 	elif state == "attacking":
-		handpos.x += attack_power*3
-		handpos.z -= abs(attack_power)
+		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+		#handpos.x += attack_power*2
+		handpos.z += abs(attack_power)*0.5
+		handpos.y -= abs(attack_power)*1
 		handtarget.position = lerp(handtarget.position, handpos,delta*10)
 		centerbasis = centerbasis.rotated(Vector3(0, 1, 0),PI/2*attack_power).orthonormalized()
 		centerbasis = centerbasis.rotated(Vector3(1, 0, 0),PI/2).orthonormalized()
+		#-0.3*(1.0 - abs(attack_power))
 		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 1, 0),attack_power*1).orthonormalized())
-		if (handtarget.position-handpos).length() < 0.01:
+		if $AttackTimer.is_stopped():
 			state = "recovery"
+			$AttackTimer.wait_time/=1.3
 			$AttackTimer.start()
-		rotspeed = 1
-		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
 	elif state == "recovery":
 		handtarget.position = lerp(handtarget.position, handpos,delta*2)
+		target_rot = Quaternion(centerbasis)
 		if (handtarget.position-handpos).length() < 1:
 			state = "normal"
-		rotspeed = 0.01
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
 	current_rot = current_rot.normalized()
 	target_rot = target_rot.normalized()
-	handtarget.basis = Basis(current_rot.slerp(target_rot,0.1))
+	handtarget.basis = Basis(current_rot.slerp(target_rot,progress))
 	#handtarget.basis = Basis(target_rot)
 	handtarget.transform = handtarget.transform.orthonormalized()

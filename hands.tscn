@@ -31,10 +31,10 @@ script = ExtResource("2_x7rq2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="left" type="Node3D" parent="Target" index="0"]
-transform = Transform3D(0.129246, -0.991613, -6.02183e-09, 0.479411, 0.0624858, -0.875363, 0.868021, 0.113137, 0.483466, 0.122683, -0.844928, 0)
+transform = Transform3D(0.129246, -0.991613, -6.02183e-09, 0.479411, 0.0624858, -0.875363, 0.868021, 0.113137, 0.483466, 0.347749, -1.21708, 0)
 
 [node name="right" type="Node3D" parent="Target" index="1"]
-transform = Transform3D(0.504708, 0.86329, 0, 0.429582, -0.251148, -0.867401, -0.748818, 0.437784, -0.49761, -0.121736, -0.460857, 0)
+transform = Transform3D(0.504708, 0.86329, 0, 0.429582, -0.251148, -0.867401, -0.748818, 0.437784, -0.49761, -0.352195, -0.460857, 0)
 
 [node name="Area3D" type="Area3D" parent="Target" index="2"]
 

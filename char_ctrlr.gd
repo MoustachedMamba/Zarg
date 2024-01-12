@@ -36,6 +36,10 @@ var default_handpos
 var attack_hold_dir = 0
 var attack_power = 0
 var state = "normal"
+var attack_start_transform
+var angle_from_speed
+
+
 func _ready():
 	start_pos = position
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -82,13 +86,20 @@ func _physics_process(delta):
 	
 		
 func _process(delta):
+	print(state)
 	if is_on_floor():
 		head_bob_timer += delta*velocity.length()*bob_fr
 	headbob.position.y = sin(head_bob_timer)*clamp(current_speed,3.0,5.0)*bob_amp
 	vert_offset = lerp(vert_offset,clamp(velocity.y,-10.0,6)*0.07,delta*4.0)
 	headbob.position.y += vert_offset*1.6
-	
-	headbob.rotation_degrees.x = vert_offset*9 
+	#headbob.rotation_degrees.x = vert_offset*9 
+	var target_basis = head.basis
+	var horizontal_vel = Vector3(velocity.x,0,velocity.z)
+	if horizontal_vel:
+		var axis = horizontal_vel.rotated(Vector3(0,1,0), PI/2)
+		var localaxis =  (axis * basis).normalized()
+		target_basis = head.basis.rotated(localaxis,horizontal_vel.length()*0.01)
+	headbob.basis = headbob.basis.slerp(target_basis,1)
 	handlehands(delta)
 			
 	
@@ -117,27 +128,19 @@ func _input(event):
 		crouch_input = false
 		crouched = is_under_smth()
 	if event.is_action_pressed("AttackLeft") and state == "normal":
+		attack_start_transform = handtarget.transform
 		attack_hold_dir = 1
 		$WindupTimer.start()
 		state = "windup"
 	if event.is_action_pressed("AttackRight") and state == "normal":
+		attack_start_transform = handtarget.transform
 		attack_hold_dir = -1
 		$WindupTimer.start()
 		state = "windup"
-	if event.is_action_released("AttackLeft") :
-		attack_hold_dir = 0
-		attack_power = -1*(0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
-		$AttackTimer.wait_time = abs(attack_power)
-		$AttackTimer.start()
-		$WindupTimer.stop()
-		state = "attacking"
-	if event.is_action_released("AttackRight"):
-		attack_hold_dir = 0
-		attack_power = (0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
-		$AttackTimer.wait_time = 0.3 + (attack_power-0.2)*0.3
-		$AttackTimer.start()
-		$WindupTimer.stop()
-		state = "attacking"
+	if  state == "windup" and (event.is_action_released("AttackRight") or event.is_action_released("AttackLeft")):
+		if ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time < 0.4:
+			state = "add_windup"
+		else: begin_attack(attack_hold_dir*-1)
 	
 func get_crouch(delta : float, crouching = false):
 	var target_height : float = crouch_height if crouching else stand_height
@@ -173,7 +176,7 @@ func die():
 
 func handlehands(delta):
 	var target_rot = Quaternion(handtarget.basis.orthonormalized())
-	var current_rot = Quaternion(handtarget.basis.orthonormalized())
+	var inteerp_start_rot = Quaternion(handtarget.basis.orthonormalized())
 	var centerbasis = $head/headbobcentre/hand_temp.basis.rotated(Vector3(0, 1, 0),PI).orthonormalized()
 	var progress = 0
 	if($head/headbobcentre/hand_temp/RayCast3D.is_colliding()):
@@ -185,19 +188,26 @@ func handlehands(delta):
 		handtarget.position = lerp(handtarget.position, handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3),delta*4)
 		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized())
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-	elif state == "windup":
-		handpos.x += (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * attack_hold_dir * 2
-		handpos.z -= (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * 1
-		handpos.y += (1 - $WindupTimer.time_left/$WindupTimer.wait_time) * 1
-		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),-0.4*attack_hold_dir).orthonormalized())
-		handtarget.position = lerp(handtarget.position, handpos,delta*10)
-		progress = pow(1-$WindupTimer.time_left/$WindupTimer.wait_time, 2.0)
+	elif state == "windup" or state == "add_windup":
+		progress = 1-$WindupTimer.time_left/$WindupTimer.wait_time
+		progress = pow(progress, 0.6)
+		handpos.x += progress * attack_hold_dir * 2
+		handpos.z -= progress * 1
+		handpos.y += progress * 1
+		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
+		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),-1.0*attack_hold_dir).orthonormalized())
+		handtarget.position = lerp(handtarget.position, handpos, delta*4)
+		if  state == "add_windup" and ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time >= 0.4:
+			begin_attack(attack_hold_dir*-1)
 	elif state == "attacking":
-		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-		#handpos.x += attack_power*2
+		progress = 1 - $AttackTimer.time_left / $AttackTimer.wait_time
+		progress = pow(progress, 1.3)
+		handpos.x += attack_power*2
 		handpos.z += abs(attack_power)*0.5
 		handpos.y -= abs(attack_power)*1
-		handtarget.position = lerp(handtarget.position, handpos,delta*10)
+		handtarget.position = (handpos - attack_start_transform.origin)*progress + attack_start_transform.origin
+		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
+		#handtarget.position = lerp(handtarget.position, handpos,delta*10)
 		centerbasis = centerbasis.rotated(Vector3(0, 1, 0),PI/2*attack_power).orthonormalized()
 		centerbasis = centerbasis.rotated(Vector3(1, 0, 0),PI/2).orthonormalized()
 		#-0.3*(1.0 - abs(attack_power))
@@ -207,13 +217,23 @@ func handlehands(delta):
 			$AttackTimer.wait_time/=1.3
 			$AttackTimer.start()
 	elif state == "recovery":
-		handtarget.position = lerp(handtarget.position, handpos,delta*2)
+		handtarget.position = lerp(handtarget.position, handpos,delta*3)
 		target_rot = Quaternion(centerbasis)
-		if (handtarget.position-handpos).length() < 1:
+		if (handtarget.position-handpos).length() < 0.5:
 			state = "normal"
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-	current_rot = current_rot.normalized()
+	inteerp_start_rot = inteerp_start_rot.normalized()
 	target_rot = target_rot.normalized()
-	handtarget.basis = Basis(current_rot.slerp(target_rot,progress))
+	handtarget.basis = Basis(inteerp_start_rot.slerp(target_rot,progress))
 	#handtarget.basis = Basis(target_rot)
 	handtarget.transform = handtarget.transform.orthonormalized()
+
+func begin_attack(dir):
+	attack_start_transform = handtarget.transform
+	attack_hold_dir = 0
+	attack_power = (0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
+	attack_power *= dir
+	$AttackTimer.wait_time = 0.2 + (abs(attack_power)-0.2)*0.3
+	$AttackTimer.start()
+	$WindupTimer.stop()
+	state = "attacking"

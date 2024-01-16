@@ -15,6 +15,7 @@ extends CharacterBody3D
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
 @onready var collider = $CollisionShape3D
+@onready var atk_crv = load("res://attack_curve.tres")
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var look_rot : Vector2
@@ -47,6 +48,9 @@ func _ready():
 	handtarget = $head/headbobcentre/hand_temp/Target
 	default_handpos = handtarget.position
 	handpos = default_handpos
+	
+	var area = $head/headbobcentre/hand_temp/Target/Area3D
+	area.body_entered.connect(sword_collision)
 	
 	
 func _physics_process(delta):
@@ -86,20 +90,19 @@ func _physics_process(delta):
 	
 		
 func _process(delta):
-	print(state)
 	if is_on_floor():
 		head_bob_timer += delta*velocity.length()*bob_fr
 	headbob.position.y = sin(head_bob_timer)*clamp(current_speed,3.0,5.0)*bob_amp
-	vert_offset = lerp(vert_offset,clamp(velocity.y,-10.0,6)*0.07,delta*4.0)
+	vert_offset = lerp(vert_offset,clamp(velocity.y,-10.0,0)*0.07,delta*4.0)
 	headbob.position.y += vert_offset*1.6
 	#headbob.rotation_degrees.x = vert_offset*9 
-	var target_basis = head.basis
+	var target_basis = Basis(Vector3(1,0,0),Vector3(0,1,0), Vector3(0,0,1))
 	var horizontal_vel = Vector3(velocity.x,0,velocity.z)
-	if horizontal_vel:
-		var axis = horizontal_vel.rotated(Vector3(0,1,0), PI/2)
+	if horizontal_vel.length() > 0.0:
+		var axis = horizontal_vel.normalized().rotated(Vector3(0,1,0), PI/2)
 		var localaxis =  (axis * basis).normalized()
-		target_basis = head.basis.rotated(localaxis,horizontal_vel.length()*0.01)
-	headbob.basis = headbob.basis.slerp(target_basis,1)
+		target_basis = target_basis.rotated(localaxis,horizontal_vel.length()*0.01)
+	headbob.basis = target_basis
 	handlehands(delta)
 			
 	
@@ -180,31 +183,35 @@ func handlehands(delta):
 	var centerbasis = $head/headbobcentre/hand_temp.basis.rotated(Vector3(0, 1, 0),PI).orthonormalized()
 	var progress = 0
 	if($head/headbobcentre/hand_temp/RayCast3D.is_colliding()):
-		handpos = $head/headbobcentre/hand_temp.to_local($head/headbobcentre/hand_temp/RayCast3D.get_collision_point())*3/5
+		handpos = $head/headbobcentre/hand_temp.to_local($head/headbobcentre/hand_temp/RayCast3D.get_collision_point())*1/2
 	else:
 		handpos = default_handpos
 	if state == "normal":
 		target_rot = Quaternion(centerbasis)
 		handtarget.position = lerp(handtarget.position, handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3),delta*4)
 		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized())
-		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+		progress = 1
 	elif state == "windup" or state == "add_windup":
 		progress = 1-$WindupTimer.time_left/$WindupTimer.wait_time
-		progress = pow(progress, 0.6)
+		progress = pow(progress, 0.2)
+		progress = atk_crv.sample(progress)
 		handpos.x += progress * attack_hold_dir * 2
-		handpos.z -= progress * 1
+		handpos.z -= progress * 1.2
 		handpos.y += progress * 1
+		progress = 1-$WindupTimer.time_left/$WindupTimer.wait_time
+		progress = pow(progress, 0.6)
 		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
-		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),-1.0*attack_hold_dir).orthonormalized())
+		var target_rot_basis = centerbasis.rotated(Vector3(0, 0, 1),-1.0*attack_hold_dir).orthonormalized()
+		target_rot = Quaternion(target_rot_basis.rotated(Vector3(1, 0, 0),abs(attack_hold_dir)*-0.4).orthonormalized())
 		handtarget.position = lerp(handtarget.position, handpos, delta*4)
 		if  state == "add_windup" and ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time >= 0.4:
 			begin_attack(attack_hold_dir*-1)
 	elif state == "attacking":
 		progress = 1 - $AttackTimer.time_left / $AttackTimer.wait_time
-		progress = pow(progress, 1.3)
-		handpos.x += attack_power*2
+		progress = (sin(PI*progress-PI/2) + 1)/2
+		handpos.x += attack_power*1
 		handpos.z += abs(attack_power)*0.5
-		handpos.y -= abs(attack_power)*1
+		handpos.y -= abs(attack_power)*1.5
 		handtarget.position = (handpos - attack_start_transform.origin)*progress + attack_start_transform.origin
 		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
 		#handtarget.position = lerp(handtarget.position, handpos,delta*10)
@@ -214,14 +221,27 @@ func handlehands(delta):
 		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 1, 0),attack_power*1).orthonormalized())
 		if $AttackTimer.is_stopped():
 			state = "recovery"
-			$AttackTimer.wait_time/=1.3
 			$AttackTimer.start()
+			attack_start_transform = handtarget.transform
 	elif state == "recovery":
-		handtarget.position = lerp(handtarget.position, handpos,delta*3)
 		target_rot = Quaternion(centerbasis)
-		if (handtarget.position-handpos).length() < 0.5:
+		handtarget.position = lerp(handtarget.position, handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3),delta*4)
+		target_rot = Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized())
+		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
+		if $AttackTimer.is_stopped():
 			state = "normal"
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+	
+	elif state == "bounce":
+		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+		progress = pow(progress,3.0)
+		handpos =  attack_start_transform.origin * (1-progress) + progress*(handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3))
+		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+		progress = pow(progress,0.6)
+		target_rot = Quaternion(attack_start_transform.basis).slerp(Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized()),progress)
+		handtarget.position = lerp(handtarget.position,handpos,delta*10)
+		if $AttackTimer.is_stopped(): 
+			state = "normal"
 	inteerp_start_rot = inteerp_start_rot.normalized()
 	target_rot = target_rot.normalized()
 	handtarget.basis = Basis(inteerp_start_rot.slerp(target_rot,progress))
@@ -231,9 +251,16 @@ func handlehands(delta):
 func begin_attack(dir):
 	attack_start_transform = handtarget.transform
 	attack_hold_dir = 0
-	attack_power = (0.2+(($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time)*0.8)
+	attack_power = ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time
 	attack_power *= dir
-	$AttackTimer.wait_time = 0.2 + (abs(attack_power)-0.2)*0.3
+	$AttackTimer.wait_time = 0.1 + (abs(attack_power))*0.3
 	$AttackTimer.start()
 	$WindupTimer.stop()
 	state = "attacking"
+	
+
+func sword_collision(body):
+	if state == "attacking":
+		state = "bounce"
+		$AttackTimer.wait_time*=3
+		$AttackTimer.start()

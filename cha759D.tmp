@@ -18,6 +18,17 @@ size = Vector3(0.4, 1.5, 0.4)
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
 script = ExtResource("1_sdke7")
+walk_speed = null
+sprint_speed = null
+crouch_walk_speed = null
+jump_velocity = null
+sensitivity = null
+camera_responsive = null
+air_control = null
+gain_accel = null
+lose_accel = null
+bob_amp = null
+bob_fr = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

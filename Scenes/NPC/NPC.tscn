@@ -1,0 +1,33 @@
+[gd_scene load_steps=7 format=3 uid="uid://b3w1wry8n3hp7"]
+
+[ext_resource type="Script" path="res://Scenes/NPC/NPC_Controller.gd" id="1_pg5wu"]
+[ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_StateMachine.gd" id="2_0lko8"]
+[ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_idle.gd" id="3_7ty13"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xinc"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_7wprj"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_ua31g"]
+
+[node name="NPC" type="CharacterBody3D" groups=["NPC"]]
+script = ExtResource("1_pg5wu")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_0xinc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+mesh = SubResource("CapsuleMesh_7wprj")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.00941813, 1.44421, 0.215668)
+mesh = SubResource("PrismMesh_ua31g")
+
+[node name="NPC_StateMachine" type="Node" parent="."]
+script = ExtResource("2_0lko8")
+
+[node name="NPC_idle" type="Node" parent="NPC_StateMachine"]
+script = ExtResource("3_7ty13")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]

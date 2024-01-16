@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3 uid="uid://m6v0krg74wqd"]
+
+[ext_resource type="Texture2D" uid="uid://cp512s840d5rd" path="res://icon.svg" id="1_w3wsn"]
+[ext_resource type="PackedScene" uid="uid://blvmdr608af46" path="res://Scenes/MainCharacter/char_ctrlr.tscn" id="1_wxcyp"]
+[ext_resource type="PackedScene" uid="uid://b3w1wry8n3hp7" path="res://Scenes/NPC/NPC.tscn" id="3_m4lbs"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_l4f8q"]
+vertices = PackedVector3Array(-14.5, 0, 7.25, -14.5, 0, 14.5, -7.25, 0, 14.5, 7.25, 0, 14.5, 14.5, 0, 14.5, 14.5, 0, 7.25, 14.5, 0, -7.25, 14.5, 0, -14.5, 7.25, 0, -14.5, -7.25, 0, -14.5, -14.5, 0, -14.5, -14.5, 0, -7.25, -14.5, 0, 0, -14.5, 0, 7.25, -7.25, 0, 14.5, 0, 0, 14.5, 7.25, 0, 14.5, 14.5, 0, 7.25, 14.5, 0, 0, 14.5, 0, -7.25, 7.25, 0, -14.5, 0, 0, -14.5, 0, 0, -14.5, -7.25, 0, -14.5, -14.5, 0, -7.25, -14.5, 0, 0, 14.5, 0, 0, 0, 0, -14.5, -14.5, 0, 0, -7.25, 0, 14.5, 0, 0, 14.5, 14.5, 0, 7.25)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(5, 4, 3), PackedInt32Array(8, 7, 6), PackedInt32Array(11, 10, 9), PackedInt32Array(14, 13, 12), PackedInt32Array(17, 16, 15), PackedInt32Array(19, 18, 20), PackedInt32Array(20, 18, 21), PackedInt32Array(23, 22, 24), PackedInt32Array(24, 22, 25), PackedInt32Array(31, 30, 26), PackedInt32Array(26, 30, 29), PackedInt32Array(26, 29, 28), PackedInt32Array(26, 28, 27)]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p3tmh"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_5qgev"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7v4da"]
+albedo_texture = ExtResource("1_w3wsn")
+
+[node name="NavTest" type="Node3D"]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_l4f8q")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D"]
+transform = Transform3D(30, 0, 0, 0, 1, 0, 0, 0, 30, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D"]
+shape = SubResource("BoxShape3D_p3tmh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D"]
+mesh = SubResource("BoxMesh_5qgev")
+surface_material_override/0 = SubResource("StandardMaterial3D_7v4da")
+
+[node name="CharacterBody3D" parent="." instance=ExtResource("1_wxcyp")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.353553, 0.353553, 0, -0.707107, 0.707107, 0.5, -0.612372, -0.612372, 0, 5, 0)
+light_color = Color(1, 0.368627, 1, 1)
+
+[node name="NPC" parent="." instance=ExtResource("3_m4lbs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.47327, 0, 0)

@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://c74jk5ogqfuu5"]
+
+[ext_resource type="Script" path="res://dummy.gd" id="1_f5fjk"]
+[ext_resource type="Script" path="res://SubViewport.gd" id="1_yx0no"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ttqbx"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vfsh7"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_k3lgn"]
+viewport_path = NodePath("Sprite3D/SubViewport")
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_f5fjk")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("CapsuleShape3D_ttqbx")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+mesh = SubResource("CapsuleMesh_vfsh7")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30516, 0)
+texture = SubResource("ViewportTexture_k3lgn")
+
+[node name="SubViewport" type="SubViewport" parent="Sprite3D"]
+size = Vector2i(93, 26)
+script = ExtResource("1_yx0no")
+
+[node name="Label" type="Label" parent="Sprite3D/SubViewport"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "sadfasdfasd"

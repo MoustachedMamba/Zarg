@@ -144,6 +144,11 @@ func _input(event):
 		if ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time < 0.4:
 			state = "add_windup"
 		else: begin_attack(attack_hold_dir*-1)
+	if event.is_action_released("Thrust"):
+		state = "thrust"
+		$AttackTimer.wait_time = 0.6
+		$AttackTimer.start()
+		attack_start_transform = handtarget.transform
 	
 func get_crouch(delta : float, crouching = false):
 	var target_height : float = crouch_height if crouching else stand_height
@@ -242,6 +247,17 @@ func handlehands(delta):
 		handtarget.position = lerp(handtarget.position,handpos,delta*10)
 		if $AttackTimer.is_stopped(): 
 			state = "normal"
+	elif state == "thrust":
+		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
+		progress = pow(progress,3.0)
+		handpos.z += 3
+		handtarget.position = (handpos - attack_start_transform.origin)*progress + attack_start_transform.origin
+		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
+		centerbasis = centerbasis.rotated(Vector3(0, 1, 0),PI/2*attack_power).orthonormalized()
+		centerbasis = centerbasis.rotated(Vector3(1, 0, 0),PI/2).orthonormalized()
+		if $AttackTimer.is_stopped(): 
+			state = "normal"
+		
 	inteerp_start_rot = inteerp_start_rot.normalized()
 	target_rot = target_rot.normalized()
 	handtarget.basis = Basis(inteerp_start_rot.slerp(target_rot,progress))
@@ -264,3 +280,8 @@ func sword_collision(body):
 		state = "bounce"
 		$AttackTimer.wait_time*=3
 		$AttackTimer.start()
+		if body.owner is Dummy:
+			body.owner.add_damage(abs(attack_power))
+		else:
+			pass
+			

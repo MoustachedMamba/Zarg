@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://cjed726atn3tc"]
+[gd_scene load_steps=12 format=3 uid="uid://cjed726atn3tc"]
 
 [ext_resource type="PackedScene" uid="uid://blvmdr608af46" path="res://char_ctrlr.tscn" id="1_8w41q"]
 [ext_resource type="Script" path="res://killvolume.gd" id="2_bbpmc"]
+[ext_resource type="PackedScene" uid="uid://c74jk5ogqfuu5" path="res://dummy.tscn" id="3_ssylt"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_m0wf8"]
 size = Vector3(18.85, 1, 12.38)
@@ -119,3 +120,6 @@ script = ExtResource("2_bbpmc")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72692, 1.77623, -0.138409)
 shape = SubResource("BoxShape3D_p5iun")
+
+[node name="Node3D" parent="." instance=ExtResource("3_ssylt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00728083, 1.6222, 0.0128245)

@@ -2,10 +2,9 @@ extends StateMachine
 class_name NPC_StateMachine
 
 
-var npc: CharacterBody3D
+@export var npc: CharacterBody3D
 
 
-func _ready():
-	npc = get_parent()
-	super()
-	
+func change_to(state):
+	print("Changed to ", state)
+	super(state)

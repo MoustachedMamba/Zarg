@@ -12,10 +12,12 @@ extends CharacterBody3D
 @export var lose_accel = 6.5
 @export var bob_amp = 0.02
 @export var bob_fr = 3.0
+@export var max_stamina = 100
 @onready var head = $head
 @onready var headbob = $head/headbobcentre
 @onready var collider = $CollisionShape3D
 @onready var atk_crv = load("res://attack_curve.tres")
+@onready var thrst_crv = load("res://thrust_curve.tres")
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var look_rot : Vector2
@@ -39,7 +41,8 @@ var attack_power = 0
 var state = "normal"
 var attack_start_transform
 var angle_from_speed
-
+var stamina = max_stamina
+var walking = false
 
 func _ready():
 	start_pos = position
@@ -71,13 +74,15 @@ func _physics_process(delta):
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction and is_on_floor():
+		walking = true
 		velocity.x = lerp(velocity.x,direction.x * current_speed,gain_accel*delta)
 		velocity.z = lerp(velocity.z,direction.z * current_speed,gain_accel*delta)
 	elif is_on_floor():
+		walking = false
 		velocity.x = lerp(velocity.x, 0.0, lose_accel*delta)
 		velocity.z = lerp(velocity.z, 0.0, lose_accel*delta)
 	else:
-		pass
+		walking = false
 
 	move_and_slide()
 	look_rot.x = lerp(look_rot.x,look_target.x,delta*camera_responsive.x)
@@ -104,6 +109,7 @@ func _process(delta):
 		target_basis = target_basis.rotated(localaxis,horizontal_vel.length()*0.01)
 	headbob.basis = target_basis
 	handlehands(delta)
+	handle_stamina(delta)
 			
 	
 func _input(event):
@@ -118,11 +124,12 @@ func _input(event):
 	if event.is_action_pressed("Return") and Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-	if event.is_action_pressed("Jump") and is_on_floor() and !is_under_smth():
+	if event.is_action_pressed("Jump") and is_on_floor() and !is_under_smth() and stamina >20:
+		stamina -=20
 		velocity.y = jump_velocity
 	if event.is_action_pressed("Sprint"):
 		sprinting = true
-	if event.is_action_released("Sprint"):
+	if event.is_action_released("Sprint") or stamina <=0:
 		sprinting = false
 	if event.is_action_pressed("Crouch"):
 		if is_on_floor(): crouched = true
@@ -130,24 +137,26 @@ func _input(event):
 	if event.is_action_released("Crouch"):
 		crouch_input = false
 		crouched = is_under_smth()
-	if event.is_action_pressed("AttackLeft") and state == "normal":
+	if event.is_action_pressed("AttackLeft") and state == "normal" and stamina > 10:
 		attack_start_transform = handtarget.transform
 		attack_hold_dir = 1
 		$WindupTimer.start()
 		state = "windup"
-	if event.is_action_pressed("AttackRight") and state == "normal":
+	if event.is_action_pressed("AttackRight") and state == "normal" and stamina > 10:
 		attack_start_transform = handtarget.transform
 		attack_hold_dir = -1
 		$WindupTimer.start()
 		state = "windup"
-	if  state == "windup" and (event.is_action_released("AttackRight") or event.is_action_released("AttackLeft")):
+	if  state == "windup" and (event.is_action_released("AttackRight") or event.is_action_released("AttackLeft") or stamina <= 0):
 		if ($WindupTimer.wait_time - $WindupTimer.time_left)/$WindupTimer.wait_time < 0.4:
 			state = "add_windup"
 		else: begin_attack(attack_hold_dir*-1)
-	if event.is_action_released("Thrust"):
+	if event.is_action_released("Thrust") and state == "normal" and stamina > 20:
+		stamina -= 20
 		state = "thrust"
 		$AttackTimer.wait_time = 0.6
 		$AttackTimer.start()
+		attack_power = 0.5
 		attack_start_transform = handtarget.transform
 	
 func get_crouch(delta : float, crouching = false):
@@ -242,21 +251,24 @@ func handlehands(delta):
 		progress = pow(progress,3.0)
 		handpos =  attack_start_transform.origin * (1-progress) + progress*(handpos+Vector3(sin(head_bob_timer/2)*0.8,sin(head_bob_timer)*0.3,sin(head_bob_timer)*0.3))
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-		progress = pow(progress,0.6)
+		progress = pow(progress,0.8)
 		target_rot = Quaternion(attack_start_transform.basis).slerp(Quaternion(centerbasis.rotated(Vector3(0, 0, 1),sin(head_bob_timer/2)*0.1).orthonormalized()),progress)
 		handtarget.position = lerp(handtarget.position,handpos,delta*10)
 		if $AttackTimer.is_stopped(): 
 			state = "normal"
 	elif state == "thrust":
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-		progress = pow(progress,3.0)
-		handpos.z += 3
-		handtarget.position = (handpos - attack_start_transform.origin)*progress + attack_start_transform.origin
+		handpos.z += 2.0
+		handtarget.position = (handpos - attack_start_transform.origin)*thrst_crv.sample(progress) + attack_start_transform.origin
 		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
-		centerbasis = centerbasis.rotated(Vector3(0, 1, 0),PI/2*attack_power).orthonormalized()
 		centerbasis = centerbasis.rotated(Vector3(1, 0, 0),PI/2).orthonormalized()
+		target_rot = Quaternion(centerbasis.orthonormalized())
+		progress = pow(progress,0.7)
 		if $AttackTimer.is_stopped(): 
-			state = "normal"
+			state = "recovery"
+			$AttackTimer.wait_time= 0.7
+			$AttackTimer.start()
+			attack_start_transform = handtarget.transform
 		
 	inteerp_start_rot = inteerp_start_rot.normalized()
 	target_rot = target_rot.normalized()
@@ -276,12 +288,29 @@ func begin_attack(dir):
 	
 
 func sword_collision(body):
-	if state == "attacking":
+	if state == "attacking" or state == "thrust":
 		state = "bounce"
-		$AttackTimer.wait_time*=3
+		if state == "attacking":
+			$AttackTimer.wait_time *= 5
 		$AttackTimer.start()
 		if body.owner is Dummy:
 			body.owner.add_damage(abs(attack_power))
 		else:
 			pass
-			
+
+func handle_stamina(delta):
+	if state == "windup" or state == "add_windup":
+		if $WindupTimer.time_left > 0:
+			stamina -= 25*delta
+		else:
+			stamina -= 5*delta
+	if sprinting:
+		stamina -= 10*delta
+	elif walking and state == "normal":
+		stamina += 5*delta
+	elif state == "normal":
+		stamina += 20*delta
+	stamina = clamp(stamina,0,100)
+	$ColorRect/Label.text = str(stamina)
+	$ColorRect.set_size(Vector2(max_stamina*5,50))
+	$ColorRect/ColorRect2.set_size(Vector2(stamina*5,50))

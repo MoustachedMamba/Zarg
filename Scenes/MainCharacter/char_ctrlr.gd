@@ -74,6 +74,7 @@ func _physics_process(delta):
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	direction += (transform.basis * Vector3(0, 0, clamp(input_dir.y,-1,0))).normalized() * 0.3
 	if direction and is_on_floor():
 		walking = true
 		velocity.x = lerp(velocity.x,direction.x * current_speed,gain_accel*delta)
@@ -292,13 +293,18 @@ func begin_attack(dir):
 	
 
 func sword_collision(body):
+	print(body)
 	if state == "attacking" or state == "thrust":
+		print(state)
 		if state == "thrust":
 			await thrust
-			print("aaaa")
-		state = "bounce"
 		if state == "attacking":
-			$AttackTimer.wait_time *= 5
+			$AttackTimer.wait_time *= 3
+			state = "bounce"
+		else:
+			state = "recovery"
+			attack_start_transform = handtarget.transform
+			print("aboba")
 		$AttackTimer.start()
 		if body.owner is Dummy:
 			body.owner.add_damage(abs(attack_power))

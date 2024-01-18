@@ -3,12 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://dqg6lpm4conkc" path="res://hand_temp.glb" id="1_0iwf5"]
 [ext_resource type="ArrayMesh" uid="uid://63omqjvlu5wp" path="res://extracted/hand_temp_ver2_Cube.res" id="2_ryklu"]
 [ext_resource type="Script" path="res://SkeletonIK3D_R.gd" id="2_x7rq2"]
+[ext_resource type="ArrayMesh" uid="uid://bpo6fp1l3b7oq" path="res://extracted/sword_Cube.res" id="4_0065d"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0ujsv"]
-size = Vector3(0.5, 4, 0.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_8fhnm"]
-size = Vector3(0.25, 4, 0.5)
+size = Vector3(0.5, 3.7, 0.5)
 
 [node name="hand_temp" instance=ExtResource("1_0iwf5")]
 
@@ -30,21 +28,20 @@ target_node = NodePath("../../../Target/left")
 script = ExtResource("2_x7rq2")
 
 [node name="Target" type="Node3D" parent="." index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272789, 3)
 
 [node name="left" type="Node3D" parent="Target" index="0"]
-transform = Transform3D(0.565245, -0.456227, -0.687281, -0.754166, 0.0517953, -0.654637, 0.334261, 0.888354, -0.314793, 0.240994, -0.901983, -0.358109)
+transform = Transform3D(0.537013, -0.405598, -0.739667, -0.55893, 0.48566, -0.672108, 0.631833, 0.774353, 0.0341057, 0.347478, -0.911705, -0.254073)
 
 [node name="right" type="Node3D" parent="Target" index="1"]
-transform = Transform3D(0.695772, 0.529348, 0.48548, 0.437547, 0.223652, -0.870937, -0.569607, 0.818395, -0.0760045, -0.36019, -0.588239, -0.248674)
+transform = Transform3D(0.65828, 0.580142, 0.479688, 0.437547, 0.223652, -0.870937, -0.61255, 0.783208, -0.106614, -0.275007, -0.588239, -0.248674)
 
 [node name="Area3D" type="Area3D" parent="Target" index="2"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Target/Area3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.001, 1.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.001, 1.60762, 0)
 shape = SubResource("BoxShape3D_0ujsv")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Target/Area3D/CollisionShape3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-mesh = SubResource("BoxMesh_8fhnm")
-skeleton = NodePath("../..")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Target/Area3D" index="1"]
+transform = Transform3D(-3.12536e-08, 0, 0.715, 0, 0.715, 0, -0.715, 0, -3.12536e-08, 0, 0, 0)
+mesh = ExtResource("4_0065d")

@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 const SPEED := 6.0
 const JUMP_VELOCITY = 4.5
+const TURN_SPEED = 10.0
 
 
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -28,7 +29,7 @@ func _physics_process(delta):
 	if not is_on_floor():
 			velocity.y -= gravity * delta
 	else:
-		velocity = velocity.move_toward(new_velocity, .25)
+		velocity = velocity.move_toward(new_velocity, delta*TURN_SPEED)
 	
 	if position != next_location:
 		look_at(next_location)

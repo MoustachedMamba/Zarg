@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://blvmdr608af46"]
+[gd_scene load_steps=8 format=3 uid="uid://blvmdr608af46"]
 
 [ext_resource type="Script" path="res://char_ctrlr.gd" id="1_sdke7"]
 [ext_resource type="PackedScene" uid="uid://b65hke4ime1kl" path="res://hands.tscn" id="2_mhpgr"]
+[ext_resource type="Script" path="res://AttackTimer.gd" id="3_37q4x"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_glkw2"]
 
@@ -71,6 +72,7 @@ one_shot = true
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true
+script = ExtResource("3_37q4x")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 offset_right = 306.0
@@ -84,5 +86,6 @@ offset_bottom = 40.0
 color = Color(0.721569, 0.301961, 0.509804, 1)
 
 [node name="Label" type="Label" parent="ColorRect"]
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0

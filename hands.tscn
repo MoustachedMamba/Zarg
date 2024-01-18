@@ -19,7 +19,6 @@ mesh = ExtResource("2_ryklu")
 process_priority = 1
 root_bone = &"arm1.R"
 tip_bone = &"arm3.R"
-override_tip_basis = false
 target_node = NodePath("../../../Target/right")
 script = ExtResource("2_x7rq2")
 
@@ -27,7 +26,6 @@ script = ExtResource("2_x7rq2")
 process_priority = 1
 root_bone = &"arm1.L"
 tip_bone = &"arm3.L"
-override_tip_basis = false
 target_node = NodePath("../../../Target/left")
 script = ExtResource("2_x7rq2")
 
@@ -35,10 +33,10 @@ script = ExtResource("2_x7rq2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="left" type="Node3D" parent="Target" index="0"]
-transform = Transform3D(0.769106, 0.289402, -0.569843, -0.225781, 0.957146, 0.181367, 0.597911, -0.0108302, 0.801489, 0.333411, -1.02149, -0.365415)
+transform = Transform3D(0.565245, -0.456227, -0.687281, -0.754166, 0.0517953, -0.654637, 0.334261, 0.888354, -0.314793, 0.240994, -0.901983, -0.358109)
 
 [node name="right" type="Node3D" parent="Target" index="1"]
-transform = Transform3D(0.509105, 0.657685, 0.555213, -0.408649, 0.752427, -0.516584, -0.757507, 0.0361082, 0.651827, -0.659385, -0.487165, 0.133415)
+transform = Transform3D(0.695772, 0.529348, 0.48548, 0.437547, 0.223652, -0.870937, -0.569607, 0.818395, -0.0760045, -0.36019, -0.588239, -0.248674)
 
 [node name="Area3D" type="Area3D" parent="Target" index="2"]
 

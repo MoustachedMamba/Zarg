@@ -43,6 +43,7 @@ var attack_start_transform
 var angle_from_speed
 var stamina = max_stamina
 var walking = false
+signal thrust
 
 func _ready():
 	start_pos = position
@@ -258,12 +259,15 @@ func handlehands(delta):
 			state = "normal"
 	elif state == "thrust":
 		progress = 1-$AttackTimer.time_left / $AttackTimer.wait_time
-		handpos.z += 2.0
+		handpos.z += 1.8
+		handpos.y += 1.0
 		handtarget.position = (handpos - attack_start_transform.origin)*thrst_crv.sample(progress) + attack_start_transform.origin
 		inteerp_start_rot = Quaternion(attack_start_transform.basis.orthonormalized())
 		centerbasis = centerbasis.rotated(Vector3(1, 0, 0),PI/2).orthonormalized()
 		target_rot = Quaternion(centerbasis.orthonormalized())
-		progress = pow(progress,0.7)
+		progress = pow(progress,0.9)
+		if thrst_crv.sample(progress) > 0.3:
+			thrust.emit()
 		if $AttackTimer.is_stopped(): 
 			state = "recovery"
 			$AttackTimer.wait_time= 0.7
@@ -289,6 +293,9 @@ func begin_attack(dir):
 
 func sword_collision(body):
 	if state == "attacking" or state == "thrust":
+		if state == "thrust":
+			await thrust
+			print("aaaa")
 		state = "bounce"
 		if state == "attacking":
 			$AttackTimer.wait_time *= 5

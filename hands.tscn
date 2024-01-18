@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://b65hke4ime1kl"]
+[gd_scene load_steps=6 format=3 uid="uid://b65hke4ime1kl"]
 
 [ext_resource type="PackedScene" uid="uid://dqg6lpm4conkc" path="res://hand_temp.glb" id="1_0iwf5"]
+[ext_resource type="ArrayMesh" uid="uid://63omqjvlu5wp" path="res://extracted/hand_temp_ver2_Cube.res" id="2_ryklu"]
 [ext_resource type="Script" path="res://SkeletonIK3D_R.gd" id="2_x7rq2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0ujsv"]
@@ -11,30 +12,33 @@ size = Vector3(0.25, 4, 0.5)
 
 [node name="hand_temp" instance=ExtResource("1_0iwf5")]
 
+[node name="Cube" parent="Armature_001/Skeleton3D" index="0"]
+mesh = ExtResource("2_ryklu")
+
 [node name="SkeletonIK3D_R" type="SkeletonIK3D" parent="Armature_001/Skeleton3D" index="1"]
 process_priority = 1
 root_bone = &"arm1.R"
 tip_bone = &"arm3.R"
+override_tip_basis = false
 target_node = NodePath("../../../Target/right")
-min_distance = 1.0
 script = ExtResource("2_x7rq2")
 
 [node name="SkeletonIK3D_L" type="SkeletonIK3D" parent="Armature_001/Skeleton3D" index="2"]
 process_priority = 1
 root_bone = &"arm1.L"
 tip_bone = &"arm3.L"
+override_tip_basis = false
 target_node = NodePath("../../../Target/left")
-min_distance = 0.625
 script = ExtResource("2_x7rq2")
 
 [node name="Target" type="Node3D" parent="." index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="left" type="Node3D" parent="Target" index="0"]
-transform = Transform3D(0.129246, -0.991613, -6.02183e-09, 0.479411, 0.0624858, -0.875363, 0.868021, 0.113137, 0.483466, 0.347749, -1.21708, 0)
+transform = Transform3D(0.769106, 0.289402, -0.569843, -0.225781, 0.957146, 0.181367, 0.597911, -0.0108302, 0.801489, 0.333411, -1.02149, -0.365415)
 
 [node name="right" type="Node3D" parent="Target" index="1"]
-transform = Transform3D(0.504708, 0.86329, 0, 0.429582, -0.251148, -0.867401, -0.748818, 0.437784, -0.49761, -0.352195, -0.460857, 0)
+transform = Transform3D(0.509105, 0.657685, 0.555213, -0.408649, 0.752427, -0.516584, -0.757507, 0.0361082, 0.651827, -0.659385, -0.487165, 0.133415)
 
 [node name="Area3D" type="Area3D" parent="Target" index="2"]
 

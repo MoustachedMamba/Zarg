@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://blvmdr608af46"]
 
-[ext_resource type="Script" path="res://char_ctrlr.gd" id="1_sdke7"]
+[ext_resource type="Script" path="res://Scenes/MainCharacter/char_ctrlr.gd" id="1_sdke7"]
 [ext_resource type="PackedScene" uid="uid://b65hke4ime1kl" path="res://hands.tscn" id="2_mhpgr"]
 [ext_resource type="Script" path="res://AttackTimer.gd" id="3_37q4x"]
 

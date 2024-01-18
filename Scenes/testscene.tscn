@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://cjed726atn3tc"]
 
-[ext_resource type="PackedScene" uid="uid://blvmdr608af46" path="res://char_ctrlr.tscn" id="1_8w41q"]
+[ext_resource type="PackedScene" uid="uid://blvmdr608af46" path="res://Scenes/MainCharacter/char_ctrlr.tscn" id="1_8w41q"]
 [ext_resource type="Script" path="res://killvolume.gd" id="2_bbpmc"]
 [ext_resource type="PackedScene" uid="uid://c74jk5ogqfuu5" path="res://dummy.tscn" id="3_ssylt"]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b3w1wry8n3hp7"]
+[gd_scene load_steps=9 format=3 uid="uid://b3w1wry8n3hp7"]
 
 [ext_resource type="Script" path="res://Scenes/NPC/NPC_Controller.gd" id="1_pg5wu"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_StateMachine.gd" id="2_0lko8"]
@@ -11,8 +11,6 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7wprj"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_ua31g"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_bghkh"]
 
 [node name="NPC" type="CharacterBody3D" groups=["NPC"]]
 script = ExtResource("1_pg5wu")
@@ -46,25 +44,10 @@ target_desired_distance = 2.0
 path_height_offset = 0.5
 
 [node name="RayCast3D" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62437, 0)
-target_position = Vector3(7, -0.1, 0)
-collision_mask = 3
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+target_position = Vector3(-7, 0, 0)
+collision_mask = 7
 debug_shape_custom_color = Color(0.803922, 0.231373, 0.45098, 1)
 debug_shape_thickness = 5
-
-[node name="RayCast3D2" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.46325, 0)
-target_position = Vector3(7, -0.1, 0)
-collision_mask = 3
-debug_shape_custom_color = Color(0.803922, 0.231373, 0.45098, 1)
-debug_shape_thickness = 5
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RayCast3D2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.01121, 0)
-mesh = SubResource("SphereMesh_bghkh")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="RayCast3D2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.01121, 0)
-mesh = SubResource("SphereMesh_bghkh")
 
 [connection signal="target_reached" from="NavigationAgent3D" to="." method="_on_navigation_agent_3d_target_reached"]

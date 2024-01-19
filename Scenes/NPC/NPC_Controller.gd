@@ -3,8 +3,8 @@ extends CharacterBody3D
 
 const SPEED := 6.0
 const JUMP_VELOCITY = 4.5
-const TURN_SPEED = 10.0
-const FOV = 170.0
+const TURN_SPEED = 20.0
+const FOV = 130.0
 const VISION_LENGTH = 20.0
 
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -28,9 +28,12 @@ func _physics_process(delta):
 	var forward_vector = transform.basis*Vector3(0,0,-1).normalized()
 	var angle = acos(forward_vector.dot(player_dir))/PI * 180
 	if angle < FOV/2:
-		$RayCast3D.target_position = to_local((player.position-position).normalized()*VISION_LENGTH +position) + Vector3(0,0.1,0)
-		if $RayCast3D.is_colliding():
-			if $RayCast3D.get_collider() is CharacterBody3D:
+		$RayCast3D.target_position = $RayCast3D.to_local((player.position-position).normalized()*VISION_LENGTH + position) + Vector3(0, 2.0,0)
+		$RayCast3D2.target_position = $RayCast3D2.to_local((player.position-position).normalized()*VISION_LENGTH*0.3 + position) - Vector3(0,-0.4,0)
+		$RayCast3D2/MeshInstance3D.position = $RayCast3D2.target_position
+		$RayCast3D2/MeshInstance3D2.position = $RayCast3D.target_position
+		if $RayCast3D.is_colliding() or $RayCast3D2.is_colliding():
+			if $RayCast3D.get_collider() is CharacterBody3D or $RayCast3D2.get_collider() is CharacterBody3D:
 				player_seen_pos = player.position
 				player_direction_bias = player.velocity
 				if state_machine.current_state is NPC_find_player:
@@ -38,14 +41,16 @@ func _physics_process(delta):
 			else:
 				if state_machine.current_state is NPC_chase_player:
 					state_machine.change_to("NPC_find_player")
+	elif state_machine.current_state is NPC_chase_player:
+		state_machine.change_to(NPC_find_player)
 	
 	var direction := Vector3()
-	var current_location = global_transform.origin
+	var current_location = position
 	var next_location = nav_agent.get_next_path_position()
-	var new_velocity = (next_location - current_location).normalized() * SPEED
-	print(next_location, current_location, new_velocity)
+	var max_speed = (transform.origin.distance_to(next_location) / delta);
+	var new_velocity = (next_location - current_location).normalized() * minf(SPEED,max_speed)
 	if not is_on_floor():
-			velocity.y -= gravity * delta
+		velocity.y -= gravity * delta
 	else:
 		velocity = velocity.move_toward(new_velocity, delta*TURN_SPEED)
 	
@@ -57,9 +62,11 @@ func _physics_process(delta):
 func _on_navigation_agent_3d_target_reached():
 	if state_machine.current_state is NPC_chase_player:
 		nav_agent.target_position = position
+		print("ya dognal", position)
+		velocity = Vector3(0.0,0.0,0.0)
 		state_machine.change_to("NPC_idle")
 	elif state_machine.current_state is NPC_find_player:
-		nav_agent.target_position = player_seen_pos + Vector3(randf()*10,0,randf()*10) + randf()*player_direction_bias*10
+		nav_agent.target_position = player_seen_pos + Vector3(randf()*5,0,randf()*5) + randf()*player_direction_bias*10
 		nav_agent.target_position = nav_agent.get_final_position()
 
 

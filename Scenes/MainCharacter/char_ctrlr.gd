@@ -293,9 +293,7 @@ func begin_attack(dir):
 	
 
 func sword_collision(body):
-	print(body)
 	if state == "attacking" or state == "thrust":
-		print(state)
 		if state == "thrust":
 			await thrust
 		if state == "attacking":
@@ -304,7 +302,6 @@ func sword_collision(body):
 		else:
 			state = "recovery"
 			attack_start_transform = handtarget.transform
-			print("aboba")
 		$AttackTimer.start()
 		if body.owner is Dummy:
 			body.owner.add_damage(abs(attack_power))

@@ -4,28 +4,32 @@
 [ext_resource type="PackedScene" uid="uid://blvmdr608af46" path="res://Scenes/MainCharacter/char_ctrlr.tscn" id="1_wxcyp"]
 [ext_resource type="PackedScene" uid="uid://b3w1wry8n3hp7" path="res://Scenes/NPC/NPC.tscn" id="3_m4lbs"]
 
-[sub_resource type="NavigationMesh" id="NavigationMesh_l4f8q"]
-vertices = PackedVector3Array(10.5, 0, -7.25, 10.75, 0, -6, 14.5, 0, -6, -14.5, 0, -6, -10.5, 0, -6, -10.25, 0, -7.25, 10.5, 0, -7.25, 14.5, 0, -6, 14.5, 0, -14.5, 7.25, 0, -14.5, 0, 0, -7.25, 10.5, 0, -7.25, 7.25, 0, -14.5, 0, 0, -14.5, -14.5, 0, -14.5, -14.5, 0, -6, -10.25, 0, -7.25, -7.25, 0, -14.5, -7.25, 0, -14.5, -10.25, 0, -7.25, 0, 0, -7.25, 0, 0, -14.5, -0.25, 3.5, -6, 9.5, 3.5, -6, 0, 3.5, -6.25, -9.5, 3.5, -6.25, 14.5, 0, -6, 10.75, 0, -6, 10.5, 0, -5, 14.5, 0, 4.25, -10.25, 0, -5, -10.5, 0, -6, -14.5, 0, -6, -14.5, 0, 4.25, 14.5, 0, 4.25, 10.5, 0, -5, 0, 0, -5, 0, 0, 14.5, 7.25, 0, 14.5, 14.5, 0, 4.25, -14.5, 0, 4.25, -14.5, 0, 14.5, -7.25, 0, 14.5, 7.25, 0, 14.5, 14.5, 0, 14.5, 14.5, 0, 4.25, 0, 0, -5, -10.25, 0, -5, -14.5, 0, 4.25, -7.25, 0, 14.5, 0, 0, 14.5, 14.5, 0, 4.25)
-polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(5, 4, 3), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(13, 12, 10), PackedInt32Array(10, 12, 11), PackedInt32Array(15, 14, 16), PackedInt32Array(16, 14, 17), PackedInt32Array(21, 20, 18), PackedInt32Array(18, 20, 19), PackedInt32Array(25, 24, 22), PackedInt32Array(22, 24, 23), PackedInt32Array(27, 26, 28), PackedInt32Array(28, 26, 29), PackedInt32Array(31, 30, 32), PackedInt32Array(32, 30, 33), PackedInt32Array(36, 35, 34), PackedInt32Array(39, 38, 37), PackedInt32Array(42, 41, 40), PackedInt32Array(45, 44, 43), PackedInt32Array(49, 48, 50), PackedInt32Array(50, 48, 47), PackedInt32Array(50, 47, 46), PackedInt32Array(50, 46, 51)]
+[sub_resource type="NavigationMesh" id="NavigationMesh_skrsd"]
+vertices = PackedVector3Array(10.5, 0, -7.25, 10.75, 0, -6, 14.5, 0, -6, -14.5, 0, -6, -10.5, 0, -6, -10.25, 0, -7.25, 10.5, 0, -7.25, 14.5, 0, -6, 14.5, 0, -14.5, 7.25, 0, -14.5, 0, 0, -7.25, 10.5, 0, -7.25, 7.25, 0, -14.5, 0, 0, -14.5, -14.5, 0, -14.5, -14.5, 0, -6, -10.25, 0, -7.25, -7.25, 0, -14.5, -7.25, 0, -14.5, -10.25, 0, -7.25, 0, 0, -7.25, 0, 0, -14.5, -0.25, 3.5, -6, 9.5, 3.5, -6, 0, 3.5, -6.25, -9.5, 3.5, -6.25, 10.5, 0, 5.75, 10.75, 0, 6.75, 14.5, 0, 6.75, 14.5, 0, 0.25, 14.5, 0, -6, 10.75, 0, -6, 10.5, 0, -5, 14.5, 0, 0.25, -14.5, 0, 6.75, -10.5, 0, 6.75, -10.25, 0, 5.75, -14.5, 0, 0.25, -10.25, 0, -5, -10.5, 0, -6, -14.5, 0, -6, -14.5, 0, 0.25, -10.25, 0, -5, -14.5, 0, 0.25, -10.25, 0, 5.75, 0, 0, 5.75, 0, 0, -5, 10.5, 0, 5.75, 14.5, 0, 0.25, 10.5, 0, -5, 0, 0, -5, 0, 0, 5.75, 14.5, 0, 6.75, 10.75, 0, 6.75, 10.5, 0, 8, -10.25, 0, 8, -10.5, 0, 6.75, -14.5, 0, 6.75, 14.5, 0, 14.5, 14.5, 0, 6.75, 10.5, 0, 8, 7.25, 0, 14.5, 0, 0, 8, -10.25, 0, 8, -7.25, 0, 14.5, 0, 0, 14.5, -10.25, 0, 8, -14.5, 0, 6.75, -14.5, 0, 14.5, -7.25, 0, 14.5, 7.25, 0, 14.5, 10.5, 0, 8, 0, 0, 8, 0, 0, 14.5, -0.25, 3.5, 7, 9.5, 3.5, 7, 0, 3.5, 6.75, -9.5, 3.5, 6.75)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(5, 4, 3), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(13, 12, 10), PackedInt32Array(10, 12, 11), PackedInt32Array(15, 14, 16), PackedInt32Array(16, 14, 17), PackedInt32Array(21, 20, 18), PackedInt32Array(18, 20, 19), PackedInt32Array(25, 24, 22), PackedInt32Array(22, 24, 23), PackedInt32Array(27, 26, 28), PackedInt32Array(28, 26, 29), PackedInt32Array(31, 30, 32), PackedInt32Array(32, 30, 33), PackedInt32Array(35, 34, 36), PackedInt32Array(36, 34, 37), PackedInt32Array(39, 38, 40), PackedInt32Array(40, 38, 41), PackedInt32Array(43, 42, 44), PackedInt32Array(44, 42, 46), PackedInt32Array(44, 46, 45), PackedInt32Array(48, 47, 49), PackedInt32Array(49, 47, 51), PackedInt32Array(49, 51, 50), PackedInt32Array(52, 54, 53), PackedInt32Array(57, 56, 55), PackedInt32Array(59, 58, 60), PackedInt32Array(60, 58, 61), PackedInt32Array(65, 64, 62), PackedInt32Array(62, 64, 63), PackedInt32Array(67, 66, 68), PackedInt32Array(68, 66, 69), PackedInt32Array(73, 72, 70), PackedInt32Array(70, 72, 71), PackedInt32Array(77, 76, 74), PackedInt32Array(74, 76, 75)]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p3tmh"]
+size = Vector3(30, 1, 30)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5qgev"]
+size = Vector3(30, 1, 30)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7v4da"]
 albedo_texture = ExtResource("1_w3wsn")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wt0kw"]
+size = Vector3(20, 3, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_eekif"]
+size = Vector3(20, 3, 1)
 
 [node name="NavTest" type="Node3D"]
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
-navigation_mesh = SubResource("NavigationMesh_l4f8q")
+navigation_mesh = SubResource("NavigationMesh_skrsd")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D"]
-transform = Transform3D(30, 0, 0, 0, 1, 0, 0, 0, 30, 0, -1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D"]
 shape = SubResource("BoxShape3D_p3tmh")
@@ -35,12 +39,21 @@ mesh = SubResource("BoxMesh_5qgev")
 surface_material_override/0 = SubResource("StandardMaterial3D_7v4da")
 
 [node name="StaticBody3D2" type="StaticBody3D" parent="NavigationRegion3D"]
-transform = Transform3D(20, 0, 0, 0, 3, 0, 0, 0, 1, 0, 1.5, -6.089)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -6.089)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D2"]
 shape = SubResource("BoxShape3D_wt0kw")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D2"]
+mesh = SubResource("BoxMesh_eekif")
+
+[node name="StaticBody3D3" type="StaticBody3D" parent="NavigationRegion3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 6.90372)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D3"]
+shape = SubResource("BoxShape3D_wt0kw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D3"]
 mesh = SubResource("BoxMesh_eekif")
 
 [node name="CharacterBody3D" parent="." instance=ExtResource("1_wxcyp")]

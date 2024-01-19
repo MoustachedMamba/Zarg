@@ -8,3 +8,4 @@ class_name NPC_StateMachine
 func change_to(state):
 	print("Changed to ", state)
 	super(state)
+

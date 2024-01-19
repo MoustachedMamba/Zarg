@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b3w1wry8n3hp7"]
+[gd_scene load_steps=9 format=3 uid="uid://b3w1wry8n3hp7"]
 
 [ext_resource type="Script" path="res://Scenes/NPC/NPC_Controller.gd" id="1_pg5wu"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_StateMachine.gd" id="2_0lko8"]
@@ -12,8 +12,6 @@
 
 [sub_resource type="PrismMesh" id="PrismMesh_ua31g"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_bghkh"]
-
 [node name="NPC" type="CharacterBody3D" groups=["NPC"]]
 script = ExtResource("1_pg5wu")
 
@@ -25,7 +23,7 @@ shape = SubResource("CapsuleShape3D_0xinc")
 mesh = SubResource("CapsuleMesh_7wprj")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.00941813, 1.44421, 0.215668)
+transform = Transform3D(1, 0, 0, 0, -1.66816e-08, -1, 0, 0.38163, -4.37114e-08, 0.00941813, 1.44421, 0.215668)
 mesh = SubResource("PrismMesh_ua31g")
 
 [node name="NPC_StateMachine" type="Node" parent="." node_paths=PackedStringArray("npc")]
@@ -46,25 +44,17 @@ target_desired_distance = 2.0
 path_height_offset = 0.5
 
 [node name="RayCast3D" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62437, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.41501, 0)
 target_position = Vector3(7, -0.1, 0)
 collision_mask = 3
 debug_shape_custom_color = Color(0.803922, 0.231373, 0.45098, 1)
 debug_shape_thickness = 5
 
 [node name="RayCast3D2" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.46325, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.40895, 0)
 target_position = Vector3(7, -0.1, 0)
 collision_mask = 3
 debug_shape_custom_color = Color(0.803922, 0.231373, 0.45098, 1)
 debug_shape_thickness = 5
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RayCast3D2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.01121, 0)
-mesh = SubResource("SphereMesh_bghkh")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="RayCast3D2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.01121, 0)
-mesh = SubResource("SphereMesh_bghkh")
 
 [connection signal="target_reached" from="NavigationAgent3D" to="." method="_on_navigation_agent_3d_target_reached"]

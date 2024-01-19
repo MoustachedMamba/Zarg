@@ -3,7 +3,6 @@ class_name NPC_find_player
 
 const search_timer = 100.0
 
-var timer=0
 
 func enter():
 	super()

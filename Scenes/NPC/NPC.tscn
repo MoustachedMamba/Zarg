@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://b3w1wry8n3hp7"]
+[gd_scene load_steps=10 format=3 uid="uid://b3w1wry8n3hp7"]
 
 [ext_resource type="Script" path="res://Scenes/NPC/NPC_Controller.gd" id="1_pg5wu"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_StateMachine.gd" id="2_0lko8"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_idle.gd" id="3_7ty13"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_chase_player.gd" id="4_2jhgv"]
 [ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_find_player.gd" id="5_8c5cw"]
+[ext_resource type="Script" path="res://Scripts/FSM/FSM_NPC/NPC_look_around.gd" id="6_r7ler"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xinc"]
 
@@ -38,6 +39,9 @@ script = ExtResource("4_2jhgv")
 
 [node name="NPC_find_player" type="Node" parent="NPC_StateMachine"]
 script = ExtResource("5_8c5cw")
+
+[node name="NPC_look_around" type="Node" parent="NPC_StateMachine"]
+script = ExtResource("6_r7ler")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 2.0

@@ -3,7 +3,7 @@ extends CharacterBody3D
 
 const SPEED := 6.0
 const JUMP_VELOCITY = 4.5
-const TURN_SPEED = 20.0
+const TURN_SPEED = 25.0
 const FOV = 130.0
 const VISION_LENGTH = 30.0
 
@@ -24,8 +24,6 @@ func _ready():
 
 
 func _physics_process(delta):
-	if state_machine.current_state is NPC_find_player:
-		print(nav_agent.is_target_reachable(), " now")
 	var player_dir = (player.position - position).normalized()
 	var forward_vector = transform.basis*Vector3(0,0,-1).normalized()
 	var angle = acos(forward_vector.dot(player_dir))/PI * 180
@@ -36,7 +34,7 @@ func _physics_process(delta):
 			if $RayCast3D.get_collider() is CharacterBody3D or $RayCast3D2.get_collider() is CharacterBody3D:
 				player_seen_pos = player.position
 				player_direction_bias = player.velocity
-				if state_machine.current_state is NPC_find_player:
+				if state_machine.current_state is NPC_find_player or state_machine.current_state is NPC_look_around:
 					state_machine.change_to("NPC_chase_player")
 			else:
 				if state_machine.current_state is NPC_chase_player:
@@ -53,37 +51,39 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	else:
-		velocity = velocity.move_toward(new_velocity, delta*TURN_SPEED)
+		velocity = velocity.move_toward(new_velocity,delta*TURN_SPEED)
 	
 	if velocity.x != 0 or velocity.z != 0:
-		transform = transform.looking_at(transform.origin+Vector3(velocity.x,0,velocity.z).rotated(Vector3(0,1,0),0.8*sin(state_machine.current_state.timer*3.0)).normalized())
-		if state_machine.current_state is NPC_chase_player:
-			transform = transform.looking_at(player.position)
+		if state_machine.current_state is NPC_find_player:
+			transform = transform.looking_at(transform.origin+Vector3(velocity.x,0,velocity.z).rotated(Vector3(0,1,0),0.3*sin(state_machine.current_state.timer*0.7)).normalized())
+		elif state_machine.current_state is NPC_chase_player:
+			transform = transform.looking_at((transform.origin+Vector3(velocity.x,0,velocity.z) + player.position)/2)
+		elif state_machine.current_state is NPC_look_around:
+			transform = transform.looking_at(transform.origin+Vector3(velocity.x,0,velocity.z).rotated(Vector3(0,1,0),1.5*sin(state_machine.current_state.timer*1.7)).normalized())
 	move_and_slide()
 
 
 func _on_navigation_agent_3d_target_reached():
+	print("reached")
 	if state_machine.current_state is NPC_chase_player:
-		nav_agent.target_position = position
 		print("ya dognal", position)
-		velocity = Vector3(0.0,0.0,0.0)
 		state_machine.change_to("NPC_idle")
 	elif state_machine.current_state is NPC_find_player:
-		print(state_machine.current_state.timer/state_machine.current_state.search_timer)
-		nav_agent.target_position = player_seen_pos + Vector3(randf(),0,randf())*(5+15*state_machine.current_state.timer/state_machine.current_state.search_timer) + (randf()*6+3)*player_direction_bias
-		nav_agent.target_position = nav_agent.get_final_position()
-		print(nav_agent.is_target_reachable())
+		state_machine.change_to("NPC_look_around")
 
 
 func move_to(coor: Vector3):
-	
 	nav_agent.target_position = coor
 
 
 func get_hit():
 	state_machine.change_to("NPC_chase_player")
 
-
 func _unhandled_input(event):
 	if event.is_action_pressed("Use"):
 		state_machine.change_to("NPC_find_player")
+
+func get_search_point(radius, bias, smart_bias=0):
+	nav_agent.target_position = player_seen_pos + Vector3(randf()*radius,0,randf()*radius) + player_direction_bias * bias*randf()
+	nav_agent.target_position = (1-bias) * nav_agent.target_position + bias * player.position
+	nav_agent.target_position = nav_agent.get_final_position()

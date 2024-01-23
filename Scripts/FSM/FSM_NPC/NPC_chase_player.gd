@@ -10,4 +10,4 @@ func enter():
 
 func _physics_process(delta):
 	super(delta)
-	fsm.npc.nav_agent.target_position = fsm.npc.player_seen_pos
+	fsm.npc.move_to(fsm.npc.player_seen_pos)
